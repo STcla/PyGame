@@ -14,7 +14,8 @@ GREY = (210,210,210)
 
 #Definindo fontes
 smallfont = pygame.font.SysFont('Verdana',30)
-bigfont = pygame.font.SysFont('Verdana', 45)
+mediumfont = pygame.font.SysFont('Verdana', 45)
+bigfont = pygame.font.SysFont('Verdana', 60)
 
 #vairiáveis importantes
 FPS = 60
@@ -43,7 +44,7 @@ class MainMenu:
             self.update()
 
     def draw(self):
-            title = bigfont.render('Press The Button',True,WHITE)       #título do jogo
+            title = mediumfont.render('Press The Button',True,WHITE)       #título do jogo
 
             pygame.draw.rect(DISPLAYSURFACE, BLACK,[470,303,65,36])     #botão para Play e texto
             play_text = smallfont.render('Play',True, WHITE)
@@ -68,6 +69,8 @@ class MainMenu:
                     sys.exit()
 
                 if 470 <= self.mouse[0] <= 535 and 303 <= self.mouse[1] <= 339:             #caso o clique seja na área em que o botão de Play está
+                    DISPLAYSURFACE.fill(BLACK)
+                    self.update()
                     game.run()
 
     def update(self):
@@ -92,6 +95,7 @@ class Game:
         while self.playing:
             self.clock.tick(FPS)
             self.events()
+            print("Game running")
             
 
     def events(self):
@@ -100,24 +104,77 @@ class Game:
                 pygame.quit()
                 sys.exit()
 
+            if event.type == KEYDOWN:
+                key = pygame.key.get_pressed()
+                if key[K_RETURN]:
+                    DISPLAYSURFACE.fill(BLACK)
+                    gameover.run()
+
+                if key[K_ESCAPE]:
+                    DISPLAYSURFACE.fill(BLACK)
+                    menu.run()
+
 
 class GameOver():
     #Tela de Game Over: Mostra pontuação e Enter volta para o Menu
     def __init__(self):
         self.display = DISPLAYSURFACE
 
+    def run(self):
+        self.runnig = True
+        while self.runnig:
+            self.mouse = pygame.mouse.get_pos()
+            self.draw()
+            self.events()
+            self.update()
+
     def draw(self):
-        game_over = bigfont.render('GAME OVER', True, WHITE)
-        DISPLAYSURFACE.blit(game_over,(324,151))
-         
+        game_over = bigfont.render('GAME OVER',True,WHITE)              #mensagem de game over
+
+        score_text = smallfont.render('Score:', True, WHITE)
+        scores = smallfont.render('20',True, WHITE)
+
+        pygame.draw.rect(DISPLAYSURFACE, BLACK,[428,359,143,36])         #botão para Play Again e texto
+        play_again_text = smallfont.render('Play Again',True, WHITE)
+            
+        pygame.draw.rect(DISPLAYSURFACE, BLACK,[470,428,65,36])         #botão para Quit e texto
+        quit_text = smallfont.render('Quit',True, WHITE)
+            
+        DISPLAYSURFACE.blit(game_over,(329,157))                        #blit das surfaces
+        DISPLAYSURFACE.blit(score_text,(427,244))
+        DISPLAYSURFACE.blit(scores,(534,244))
+        DISPLAYSURFACE.blit(play_again_text,(429,359))    
+        DISPLAYSURFACE.blit(quit_text,(470,428))
+
+
+    def events(self):
+        for event in pygame.event.get():                                #evento de saída
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:                    
+                #caso o clique seja na área em que o botão de Play Again está
+                if 428 <= self.mouse[0] <= 571 and 359 <= self.mouse[1] <= 395:
+                    DISPLAYSURFACE.fill(BLACK)
+                    self.update()       
+                    game.run()
+                
+                #caso o clique seja na área em que o botão de Quit está
+                if 470 <= self.mouse[0] <= 535 and 428 <= self.mouse[1] <= 464:            
+                    pygame.quit()
+                    sys.exit()
+                
+        
+    def update(self):
+        pygame.display.update()
 
 #class Buttons():
     #5 Botões: Brilham em ordem aleatória
 
 menu = MainMenu()
 game = Game()
+gameover = GameOver()
 
 while True:
-    #capturando a posição atualizada do mouse
-    mouse = pygame.mouse.get_pos()
     menu.run()
